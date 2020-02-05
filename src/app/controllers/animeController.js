@@ -6,16 +6,26 @@ const router = express.Router();
 router.use(authMiddle);
 
 router.get('/', async (req,res) => {
-    res.send({user: req.userId});
+    try {
+        const animes = await Anime.find().populate('user');
+        return res.send({animes});
+    } catch (err) {
+        return res.status(400).send({error: 'Erro list animes'});
+    }
 });
 
 router.get('/:animeId', async (req,res) => {
-    res.send({user: req.userId});
+    try {
+        const anime = await Anime.findById(req.params.animeId).populate('user');
+        return res.send({anime});
+    } catch (err) {
+        return res.status(400).send({error: 'Erro list animes'});
+    }
 });
 
 router.post('/', async (req,res) => {
     try {
-        const anime = await Anime.create(req.body);
+        const anime = await Anime.create({...req.body, user: req.userId});
         return res.send({anime});
     } catch (err) {
         return res.status(400).send({error: 'Erro create anime'});
@@ -23,7 +33,12 @@ router.post('/', async (req,res) => {
 });
 
 router.delete('/', async (req,res) => {
-    res.send({user: req.userId});
+    try {
+        await Anime.findByIdAndRemove(req.params.animeId);
+        return res.send();
+    } catch (err) {
+        return res.status(400).send({error: 'Erro delete anime'});
+    }
 });
 
 module.exports = app => app.use('/animes', router);
