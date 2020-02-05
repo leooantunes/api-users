@@ -32,7 +32,7 @@ router.post('/', async (req,res) => {
     }
 });
 
-router.delete('/', async (req,res) => {
+router.delete('/:animeId', async (req,res) => {
     try {
         await Anime.findByIdAndRemove(req.params.animeId);
         return res.send();
